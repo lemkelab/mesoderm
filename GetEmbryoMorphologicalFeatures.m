@@ -84,12 +84,12 @@ for i = 1:length(Isurfdist)
         ingressionCS =  [ingressionCS;ingressionratioICS];
         
         %Max cell depth
-        depthICS = max(Isurfdist{i}(Isurfdist{i}(:,ycoords)>CSs & Isurfdist{i}(:,ycoords)<CSe,5));
+        depthICS = max(Isurfdist{i}(Isurfdist{i}(:,ycoords)>CSs & Isurfdist{i}(:,ycoords)<CSe,5))-eggshelladjustment;
         depthCS = [depthCS;depthICS];
         
         %Furrow depth
         if ~isempty(Isurfdist{i}(Isurfdist{i}(:,ycoords)>CSs & Isurfdist{i}(:,ycoords)<CSe & Isurfdist{i}(:,4)<=1,5))
-            depthsurfICS = max(Isurfdist{i}(Isurfdist{i}(:,ycoords)>CSs & Isurfdist{i}(:,ycoords)<CSe & Isurfdist{i}(:,4)<=1,5));
+            depthsurfICS = max(Isurfdist{i}(Isurfdist{i}(:,ycoords)>CSs & Isurfdist{i}(:,ycoords)<CSe & Isurfdist{i}(:,4)<=1,5))-eggshelladjustment;
         else
             depthsurfICS = 0;
         end
