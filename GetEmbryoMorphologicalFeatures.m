@@ -1,9 +1,10 @@
-function allFeatures = GetEmbryoMorphologicalFeatures(Isurfdist, nuclearSize)
+function allFeatures = GetEmbryoMorphologicalFeatures(Isurfdist, nuclearSize, eggshelladjustment)
 % Samples sections of the embryo to calculates the features: epithelial integrity, furrow depth, ingression
 %and maximal cell depth from the array of integrity and distances to
 %cellular surface previously generated with
 %'GetNucleitoCellSurfaceDistances'
-%Takes argument nuclear size in pixel to normalize the distances
+%Takes argument nuclear size in pixel to normalize the distances. 
+%eggshelladjustment: optional variable to take into consideration the adjustment to the eggshell outside (e.g. by adding 0.5 nuclear length)
 %Saves features in the 'allFeatures' = [internalization,integrity,furrowDepth,maxdepth]
 %internalization: gives the percentage of cells internalized in the ROI section.
 %integrity: measures for all internalized cells the ratio of cells within the epithelium in percentage from 0 to 100. 
@@ -12,6 +13,12 @@ function allFeatures = GetEmbryoMorphologicalFeatures(Isurfdist, nuclearSize)
 %the eggshell measured in times nuclearsize. 
 %maxdepth: gives the distance of the deepest nuclear centroid in the ROI section to
 %the eggshell measured in times nuclearsize. 
+ 
+if ~exist('eggshelladjustment','var')
+   eggshellthreshold = eggshelladjustment;
+else
+   eggshellthreshold = 0;
+end
  
 ALLngression = [];
 ALLngressionRatio = [];
@@ -53,6 +60,7 @@ for i = 1:length(Isurfdist)
     depthCS = [];
     depthsurfCS = [];
     ingressionCS = [];
+    internalizationthreshold = 1+eggshellthreshold;
     
     %Sample cross-sections
     for j = 1:sampling-1
@@ -62,8 +70,8 @@ for i = 1:length(Isurfdist)
         CSAN = [CSAN;CSn];
         
         %Epithelial integrity 
-        if ~isempty(CSn(CSn(:,5)> 1))
-            integrityICS = length(CSn(CSn(:,4)<=1 & CSn(:,5)> 1))/length(CSn(CSn(:,5)> 1))*100;
+        if ~isempty(CSn(CSn(:,5)> internalizationthreshold))
+            integrityICS = length(CSn(CSn(:,4)<=1 & CSn(:,5)> 1))/length(CSn(CSn(:,5)> internalizationthreshold))*100;
         else
         % for non-ingressed cells set integrity level outside the range instead of NA 
             integrityICS = 101;
@@ -72,7 +80,7 @@ for i = 1:length(Isurfdist)
         integrityCS = [integrityCS;integrityICS];
         
         %Ingression
-        ingressionratioICS = 100*(length(CSn(CSn(:,5)> 1))/length(CSn));
+        ingressionratioICS = 100*(length(CSn(CSn(:,5)> internalizationthreshold))/length(CSn));
         ingressionCS =  [ingressionCS;ingressionratioICS];
         
         %Max cell depth
@@ -108,9 +116,7 @@ for i = 1:length(Isurfdist)
     internalization = [internalization;ALLngressionRatioCS{1,i}];
 end
 
-
 allFeatures = [integrity furrowdepth internalization maxdepth];
-
 
 end
 
