@@ -1,6 +1,6 @@
-function distances = DistanceToGeneralVentralSurface(coordinates)
+function distances = DistanceToGeneralVentralSurface(coordinates, zthreshold)
 % Generated the alpha hull enclosing the centroids
-% For each point in the coordinate array find the closest face in the mesh and calculate distance to it
+% For each point in the coordinate array under the given zthreshold find the closest face in the mesh and calculate distance to it
 
 coordinates = double(coordinates);
 
@@ -27,7 +27,7 @@ for i = 1:length(coordinates)
                 p2 = coordinates(S.bnd(j,2),:);
                 p3 = coordinates(S.bnd(j,3),:);
                 
-                if(p1(3) < 120 && p2(3) < 120 && p3(3) < 120)
+                if(p1(3) < zthreshold && p2(3) < zthreshold && p3(3) < zthreshold)
                     P = createPlane(p1, p2, p3);
                     IntP = intersectLinePlane(L, P);
 
